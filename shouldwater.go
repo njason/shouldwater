@@ -1,14 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"os"
-	"encoding/json"
-	"math"
 	"time"
 )
-
 
 type NcdcResponse struct {
 	Metadata struct {
@@ -28,14 +27,14 @@ type NcdcResponse struct {
 }
 
 const PrecipitationDataType = "PRCP"
-const WateringThreshold = 1  // in inches
+const WateringThreshold = 1 // in inches
 
 // convertToInch will translate the NCDC value for precipitation, which is tenths of mm, to inches
 func convertToInch(value int) float64 {
-	return math.Round(float64(value) / 10 / 25.4 * 100) / 100
+	return math.Round(float64(value)/10/25.4*100) / 100
 }
 
-func getQueryFormat(time time.Time) string{
+func getQueryFormat(time time.Time) string {
 	return fmt.Sprintf("%d-%02d-%02d", time.Year(), time.Month(), time.Day())
 }
 
@@ -63,9 +62,9 @@ func main() {
 	var resp NcdcResponse
 	err := json.NewDecoder(rawResp.Body).Decode(&resp)
 	if err != nil {
-        fmt.Println(err.Error(), http.StatusBadRequest)
-        return
-    }
+		fmt.Println(err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	totalPrecipRaw := 0
 
@@ -78,7 +77,7 @@ func main() {
 	totalPrecip := convertToInch(totalPrecipRaw)
 
 	fmt.Printf("It's rained %.2f inches in the last week\n", totalPrecip)
-	if (totalPrecip < WateringThreshold) {
+	if totalPrecip < WateringThreshold {
 		fmt.Println("You should water the trees.")
 	} else {
 		fmt.Println("No need to water the trees, it's rained enough.")

@@ -4,7 +4,7 @@ Checks recent precipiation data in your area and decides whether it's time to wa
 
 Example usage:
 ```
-TOKEN=<web token> STATIONID=USW00094728 ./shouldwater
+TOKEN=<web token> STATION=USW00094728 ./shouldwater
 ```
 
 [Get Web Token](https://www.ncdc.noaa.gov/cdo-web/token)

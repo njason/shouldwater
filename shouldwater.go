@@ -41,7 +41,7 @@ func getQueryFormat(time time.Time) string{
 
 func main() {
 	token := os.Getenv("TOKEN")
-	stationId := os.Getenv("STATIONID")
+	stationId := os.Getenv("STATION")
 
 	client := http.DefaultClient
 

@@ -4,10 +4,10 @@ Checks recent precipiation data in your area and decides whether it's time to wa
 
 Example usage:
 ```
-TOKEN=<api key> STATIONID=USW00094728 ./shouldwater
+TOKEN=<web token> STATIONID=USW00094728 ./shouldwater
 ```
 
-[Get Token](https://www.ncdc.noaa.gov/cdo-web/token)
+[Get Web Token](https://www.ncdc.noaa.gov/cdo-web/token)
 
 [Find your station ID][https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/ghcnd-stations.txt]
 

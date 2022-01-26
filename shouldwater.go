@@ -28,6 +28,7 @@ type NcdcResponse struct {
 }
 
 const PrecipitationDataType = "PRCP"
+const WateringThreshold = 1  // in inches
 
 // convertToInch will translate the NCDC value for precipitation, which is tenths of mm, to inches
 func convertToInch(value int) float64 {
@@ -66,13 +67,20 @@ func main() {
         return
     }
 
-	totalPrecip := 0
+	totalPrecipRaw := 0
 
 	for _, result := range resp.Results {
 		if result.Datatype == PrecipitationDataType {
-			totalPrecip += result.Value
+			totalPrecipRaw += result.Value
 		}
 	}
 
-	fmt.Println(convertToInch(totalPrecip))
+	totalPrecip := convertToInch(totalPrecipRaw)
+
+	fmt.Printf("It's rained %.2f inches in the last week\n", totalPrecip)
+	if (totalPrecip < WateringThreshold) {
+		fmt.Println("You should water the trees.")
+	} else {
+		fmt.Println("No need to water the trees, it's rained enough.")
+	}
 }

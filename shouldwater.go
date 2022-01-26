@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"os"
-	"io"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 
 	resp, _ := client.Do(req)
 	defer resp.Body.Close()
-    body, _ := io.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 
 	fmt.Println(string(body))
 }

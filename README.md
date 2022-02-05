@@ -18,7 +18,7 @@ For example, the station ID for Central Park is `USW00094728`
 
 Example usage:
 ```
-go run shouldwater.go USW00094728
+go run main.go USW00094728
 ```
 
 ## Known Issues

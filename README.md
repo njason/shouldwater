@@ -28,3 +28,9 @@ The NCDC data is not always up to date and sometimes days are missing. However, 
 ```
 https://www.ncei.noaa.gov/access/services/data/v1?dataset=daily-summaries&startDate=2022-01-29&endDate=2022-02-04&stations=USW00094728&format=json
 ```
+
+This HTML table has even more up-to-date information but only the last three days: https://w1.weather.gov/data/obhistory/KNYC.html
+
+This web app has the data in color-coded map form https://water.weather.gov/precip/
+
+There's the also the "My Lawn: A Guide to Lawn Care" for Android and iOS

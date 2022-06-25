@@ -25,10 +25,8 @@ func main() {
 	// Get NCDC Precipitation
 	ncdcRainfall := dataproviders.GetNCDCRainfall(stationId, daysToRequest)	
 	
-	fmt.Println(ncdcRainfall)
-
 	if len(ncdcRainfall) < 7 {
-		fmt.Println("Insufficient data to total rain")
+		fmt.Println("Insufficient data to total rain. Only received", len(ncdcRainfall), "days of data.")
 	} else {
 		totalPrecip := 0.0
 		for _, rainyDay := range ncdcRainfall {

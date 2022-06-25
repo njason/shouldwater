@@ -14,6 +14,7 @@ import (
 
 
 const PrecipitationDataType = "PRCP"
+const NCDCDateTimeFormat = "2006-01-02T15:04:05"
 
 type NcdcConfig struct {
 	Url string `yaml:"ncdcUrl"`
@@ -110,23 +111,26 @@ func convertToInch(value int) float64 {
 
 func GetNCDCRainfall(
 	stationId string,
-	daysToRequest int) [7]models.RainfallDate {
+	daysToRequest int) []models.RainfallDate {
 
 	ncdcData := getNCDCData(stationId, daysToRequest)
 	var rainfallPerDay [7]models.RainfallDate
 
 	dayCounter := 0
 	for _, result := range ncdcData.Results {
-		fmt.Println(result)
 		if result.Datatype == PrecipitationDataType {
 			var rainyDay models.RainfallDate
-			rainyDay.Day,_ = time.Parse("YYYY-MM-DD", result.Date)
+			parsedDateTime, err := time.Parse(NCDCDateTimeFormat, result.Date)
+			if err != nil {
+				fmt.Println(err)
+			}
+			rainyDay.Day = parsedDateTime
 			rainyDay.RainfallInInches = convertToInch(result.Value)
 
 			rainfallPerDay[dayCounter] = rainyDay
 			dayCounter += 1
-		}
+		}		
 	}
 
-	return rainfallPerDay
+	return rainfallPerDay[0:dayCounter]
 }

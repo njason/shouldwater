@@ -1,1 +1,5 @@
 token: <replace with token>
+ncdcUrl: "https://www.ncdc.noaa.gov/cdo-web/api/v2/data" 
+datasetId: "GHCND"
+limit: "1000"
+knycUrl: "https://w1.weather.gov/data/obhistory/KNYC.html"

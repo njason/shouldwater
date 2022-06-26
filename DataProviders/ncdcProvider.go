@@ -40,7 +40,7 @@ type NcdcResponse struct {
 	} `json:"results"`
 }
 
-func loadConfig(configFile string) NcdcConfig {
+func loadNCDCConfig(configFile string) NcdcConfig {
 	f, err := os.Open(configFile)
 	if err != nil {
 		fmt.Println(err.Error(), http.StatusBadRequest)
@@ -66,7 +66,7 @@ func buildNcdcRequest(
 	stationId string,
 	daysToRequest int) *http.Request {
 
-	config := loadConfig("config.yaml")
+	config := loadNCDCConfig("config.yaml")
 
 	today := time.Now()
 	endDate := today.AddDate(0, 0, -1)
@@ -89,7 +89,7 @@ func getNCDCData(
 	stationId string,
 	daysToRequest int) NcdcResponse {
 
-		req := buildNcdcRequest(stationId, daysToRequest)
+	req := buildNcdcRequest(stationId, daysToRequest)
 	client := http.DefaultClient
 	rawResp, _ := client.Do(req)
 	defer rawResp.Body.Close()

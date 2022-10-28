@@ -1,16 +1,20 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"log"
 	//"flag"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/njason/shouldwater/tomorrowio"
 )
 
 type Config struct {
 	TomorrowIoApiKey string `yaml:"tomorrowioApiKey"`
+	RecordsFile	string `yaml:"recordsFile"`
+	Lat string `yaml:"lat"`
+	Lng string `yaml:"lng"`
 }
 
 const WateringThreshold = 1  // in inches
@@ -50,10 +54,8 @@ func main() {
 
 	config := loadConfig()
 
-	result, err := tomorrowIoRequest(config.TomorrowIoApiKey)
+	err := tomorrowio.RecordFreeTimelines(config.RecordsFile, config.Lat, config.Lng, config.TomorrowIoApiKey)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-
-	fmt.Println(result)
 }

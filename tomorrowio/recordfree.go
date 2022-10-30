@@ -52,3 +52,19 @@ func RecordFreeTimelines(filename string, lat string, lng string, tomorrowIoApiK
 
 	return nil
 }
+
+func LoadFreeRecords(recordsFilename string) ([][]string, error) {
+	file, err := os.Open(recordsFilename)
+	if err != nil {
+		return [][]string{}, err
+	}
+	defer file.Close()
+
+	csvReader := csv.NewReader(file)
+	data, err := csvReader.ReadAll()
+	if err != nil {
+		return [][]string{}, err
+	}
+
+	return data, nil
+}

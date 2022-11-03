@@ -1,4 +1,4 @@
-# Should I water the trees?
+# Should I water the trees? 🌳⛆
 
 A low cost solution that uses forecast and recent historical weather data to decide whether it's time to water unestablished trees which are less than two years old.
 

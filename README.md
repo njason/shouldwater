@@ -8,7 +8,7 @@ A low cost solution that uses forecast and recent historical weather data to dec
 
 Copy the `config-template.yaml` into a new file `config.yaml`, and update the following fields:
 
-- `tomorrowioApiKey`: After creating a free [tomorrow.io](https://www.tomorrow.io/) account. Find the `Secret Key` [here](https://app.tomorrow.io/development/keys)
+- `tomorrowioApiKey`: After creating a free [tomorrow.io](https://www.tomorrow.io/) account. Find the `Secret Key` [here](https://app.tomorrow.io/development/keys).
 - `lat`, `lng`: The coordinates of where to run. You can use [Google Maps](https://support.google.com/maps/answer/18539) to find coordinates, format `lat, lng`.
 
 Build a binary

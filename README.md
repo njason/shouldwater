@@ -1,6 +1,6 @@
 # Should I water the trees? 🌳⛆
 
-A low cost solution that uses forecast and recent historical weather data to decide whether it's time to water unestablished trees which are less than two years old.
+A low cost solution that uses forecast and recent historical weather data to alert tree stewards when watering is needed for unestablished trees which are less than two years old.
 
 [Guide for watering trees](https://arbordayblog.org/treecare/how-to-properly-water-your-trees/)
 

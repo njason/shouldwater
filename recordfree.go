@@ -1,10 +1,14 @@
-package tomorrowio
+package main
 
 import (
 	"encoding/csv"
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
+	"time"
+
+	"github.com/njason/shouldwater/shouldwater"
 )
 
 // RecordFreeTimelines reads in the maximum for free tier weather data into a csv file
@@ -35,8 +39,13 @@ func RecordFreeTimelines(filename string, lat string, lng string, tomorrowIoApiK
 	}
 
 	for _, interval := range resp.Data.Timelines[0].Intervals {
+		timestamp, err := interval.StartTime.MarshalText()
+		if err != nil {
+			return err
+		}
+
 		line := []string{
-			interval.StartTime.String(),
+			string(timestamp),
 			fmt.Sprintf("%f", interval.Values.Temperature),
 			fmt.Sprintf("%f", interval.Values.Humidity),
 			fmt.Sprintf("%f", interval.Values.WindSpeed), 
@@ -53,18 +62,62 @@ func RecordFreeTimelines(filename string, lat string, lng string, tomorrowIoApiK
 	return nil
 }
 
-func LoadFreeRecords(recordsFilename string) ([][]string, error) {
+func loadFreeRecords(recordsFilename string) ([]shouldwater.Record, error) {
 	file, err := os.Open(recordsFilename)
 	if err != nil {
-		return [][]string{}, err
+		return nil, err
 	}
 	defer file.Close()
 
 	csvReader := csv.NewReader(file)
-	data, err := csvReader.ReadAll()
+	rows, err := csvReader.ReadAll()
 	if err != nil {
-		return [][]string{}, err
+		return nil, err
 	}
 
-	return data, nil
+	var records []shouldwater.Record
+
+	for i, row := range rows {
+		if i == 0 {  // header row
+			continue
+		}
+
+		var timestamp time.Time
+		err := timestamp.UnmarshalText([]byte(row[0]))
+		if err != nil {
+			return nil, err
+		}
+
+		temperature, err := strconv.ParseFloat(row[1], 64)
+		if err != nil {
+			return nil, err
+		}
+
+		humidity, err :=  strconv.ParseFloat(row[2], 64)
+		if err != nil {
+			return nil, err
+		}
+
+		windSpeed, err :=  strconv.ParseFloat(row[3], 64)
+		if err != nil {
+			return nil, err
+		}
+
+		precipitation, err :=  strconv.ParseFloat(row[4], 64)
+		if err != nil {
+			return nil, err
+		}
+
+		var record = shouldwater.Record{
+			Timestamp: timestamp,
+			Temperature: temperature,
+			Humidity: humidity,
+			WindSpeed: windSpeed,
+			Precipitation: precipitation,
+		}
+
+		records = append(records, record)
+	}
+
+	return records, nil
 }

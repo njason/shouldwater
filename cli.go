@@ -1,14 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
-	"strconv"
-	"time"
+	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/njason/shouldwater/tomorrowio"
+	"github.com/njason/shouldwater/shouldwater"
 )
 
 type Config struct {
@@ -25,12 +26,17 @@ func main() {
 	}
 
 	if len(os.Args) < 2 {
-		records, err := loadRecords(config.RecordsFile)
+		records, err := loadFreeRecords(config.RecordsFile)
 		if err != nil {
 			log.Fatalln(err.Error())
 		}
 
-		shouldWater, err := ShouldWater(records)
+		shouldWater, err := shouldwater.ShouldWater(records)
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
+
+		err = archiveRecordsFile(config.RecordsFile)
 		if err != nil {
 			log.Fatalln(err.Error())
 		}
@@ -41,12 +47,12 @@ func main() {
 	} else {
 		switch os.Args[1] {
 		case "record":
-			err = tomorrowio.RecordFreeTimelines(config.RecordsFile, config.Lat, config.Lng, config.TomorrowIoApiKey)
+			err = RecordFreeTimelines(config.RecordsFile, config.Lat, config.Lng, config.TomorrowIoApiKey)
 			if err != nil {
 				log.Fatalln(err.Error())
 			}
 		default:
-			log.Fatalf("unknown command '%s'\n", os.Args[1])
+			log.Fatalf("unknown command '%s'. The only command is 'record'\n", os.Args[1])
 		}
 	}
 }
@@ -68,51 +74,14 @@ func loadConfig() (Config, error) {
 	return config, nil
 }
 
-func loadRecords(recordsFilename string) ([]Record, error) {
-	rawRecords, err := tomorrowio.LoadFreeRecords(recordsFilename)
+func archiveRecordsFile(recordsFile string) error {
+	fileName := strings.TrimSuffix(recordsFile, filepath.Ext(recordsFile))
+	archiveFile := fmt.Sprintf("%s_archive.csv", fileName)
+	err := os.Rename(recordsFile, archiveFile)
+
 	if err != nil {
-		return []Record{}, err
+		return err
 	}
 
-	var records []Record
-	for i, line := range rawRecords {
-		if i > 0 {  // omit header line
-			timestamp, err := time.Parse("D", line[0])
-			if err != nil {
-				return []Record{}, err
-			}
-
-			temperature, err := strconv.ParseFloat(line[1], 64)
-			if err != nil {
-				return []Record{}, err
-			}
-
-			humidity, err :=  strconv.ParseFloat(line[2], 64)
-			if err != nil {
-				return []Record{}, err
-			}
-
-			windSpeed, err :=  strconv.ParseFloat(line[2], 64)
-			if err != nil {
-				return []Record{}, err
-			}
-
-			precipitation, err :=  strconv.ParseFloat(line[3], 64)
-			if err != nil {
-				return []Record{}, err
-			}
-
-			var record = Record{
-				Timestamp: timestamp,
-				Temperature: temperature,
-				Humidity: humidity,
-				WindSpeed: windSpeed,
-				Precipitation: precipitation,
-			}
-
-			records = append(records, record)
-		}
-	}
-
-	return records, nil
+	return nil
 }

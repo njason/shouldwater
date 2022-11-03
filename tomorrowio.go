@@ -1,4 +1,4 @@
-package tomorrowio
+package main
 
 import (
 	"bytes"
@@ -12,7 +12,7 @@ import (
 )
 
 var client = http.Client{
-	Timeout: 2 * time.Second,
+	Timeout: 60 * time.Second,
 }
 
 var timelineFields = []string{"temperature", "humidity", "windSpeed", "precipitationIntensity"}

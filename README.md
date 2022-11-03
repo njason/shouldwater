@@ -1,36 +1,30 @@
 # Should I water the trees?
 
-Checks recent precipiation data in your area and decides whether it's time to water unestablished trees which are less than two years old.
+A low cost solution that uses forecast and recent historical weather data to decide whether it's time to water unestablished trees which are less than two years old.
 
 [Guide for watering trees](https://arbordayblog.org/treecare/how-to-properly-water-your-trees/)
 
 ## Setup
 
-First, [obtain a token](https://www.ncdc.noaa.gov/cdo-web/token)
+Copy the `config-template.yaml` into a new file `config.yaml`, and update the following fields:
 
-Next, copy the `config-template.yaml` into a new file `config.yaml` and update the file to contain your token.
+- `tomorrowioApiKey`: After creating a free [tomorrow.io](https://www.tomorrow.io/) account. Find the `Secret Key` [here]https://app.tomorrow.io/development/keys)
+- `lat`, `lng`: The coordinates of where to run. You can use [Google Maps](https://support.google.com/maps/answer/18539) to find coordinates, format `lat, lng`.
 
-## Running
+Build a binary
 
-You need to pass the station ID as an argument into the program. [Find your station ID here](https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/ghcnd-stations.txt)
-
-For example, the station ID for Central Park is `USW00094728`
-
-Example usage:
-```
-go run main.go USW00094728
-```
-
-## Known Issues
-
-The NCDC data is not always up to date and sometimes days are missing. However, when you retrieve data through another way it can contain data that NCDC doesn't have. Example request: 
+linux, macOS:
 
 ```
-https://www.ncei.noaa.gov/access/services/data/v1?dataset=daily-summaries&startDate=2022-01-29&endDate=2022-02-04&stations=USW00094728&format=json
+go build -o shouldwater-cli .
 ```
 
-This HTML table has even more up-to-date information but only the last three days: https://w1.weather.gov/data/obhistory/KNYC.html
+Windows
 
-This web app has the data in color-coded map form https://water.weather.gov/precip/
+```
+go build .
+```
 
-There's the also the "My Lawn: A Guide to Lawn Care" for Android and iOS
+The binary will need to be in the same directory as `config.yaml` to run.
+
+The binary is intented to run in record mode every 6 hours, which is the limit of free historical data from Tomorrow.io. For macOS and linux, use [cron](https://phoenixnap.com/kb/set-up-cron-job-linux) with a line like `59 0,6,12,18 * * * /path/to/shouldwater record`. On Windows 10 use [Task Scheduler](https://www.windowscentral.com/how-create-automated-task-using-task-scheduler-windows-10).

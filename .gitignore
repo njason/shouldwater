@@ -20,7 +20,8 @@
 
 # App
 
-shouldwater
+shouldwater-cli
+shouldwater.exe
 config.yaml
 records.csv
 records_archive.csv

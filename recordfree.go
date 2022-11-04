@@ -32,7 +32,7 @@ func RecordFreeTimelines(filename string, lat string, lng string, tomorrowIoApiK
 		}
 	}
 
-	tomorrowIoRequest := NewTimelinesRequest(fmt.Sprintf("%s, %s", lat, lng), "metric", "1h", "nowMinus6h", "now")
+	tomorrowIoRequest := NewTimelinesRequest(fmt.Sprintf("%s, %s", lat, lng), "metric", "1h", "nowMinus6h", "nowMinus1h")
 	resp, err := DoTimelinesRequest(tomorrowIoApiKey, tomorrowIoRequest)
 	if err != nil {
 		return err

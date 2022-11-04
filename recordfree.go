@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/njason/shouldwater/shouldwater"
+	"github.com/njason/shouldwater/shouldwaterlib"
 )
 
 // RecordFreeTimelines reads in the maximum for free tier weather data into a csv file
@@ -33,7 +33,7 @@ func RecordFreeTimelines(filename string, lat string, lng string, tomorrowIoApiK
 	}
 
 	tomorrowIoRequest := NewTimelinesRequest(fmt.Sprintf("%s, %s", lat, lng), "metric", "1h", "nowMinus6h", "now")
-	resp, err := DoTimelinesRequest(tomorrowIoRequest, tomorrowIoApiKey)
+	resp, err := DoTimelinesRequest(tomorrowIoApiKey, tomorrowIoRequest)
 	if err != nil {
 		return err
 	}
@@ -62,7 +62,7 @@ func RecordFreeTimelines(filename string, lat string, lng string, tomorrowIoApiK
 	return nil
 }
 
-func loadFreeRecords(recordsFilename string) ([]shouldwater.Record, error) {
+func loadFreeRecords(recordsFilename string) ([]shouldwaterlib.Record, error) {
 	file, err := os.Open(recordsFilename)
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func loadFreeRecords(recordsFilename string) ([]shouldwater.Record, error) {
 		return nil, err
 	}
 
-	var records []shouldwater.Record
+	var records []shouldwaterlib.Record
 
 	for i, row := range rows {
 		if i == 0 {  // header row
@@ -108,15 +108,13 @@ func loadFreeRecords(recordsFilename string) ([]shouldwater.Record, error) {
 			return nil, err
 		}
 
-		var record = shouldwater.Record{
+		records = append(records, shouldwaterlib.Record{
 			Timestamp: timestamp,
 			Temperature: temperature,
 			Humidity: humidity,
 			WindSpeed: windSpeed,
 			Precipitation: precipitation,
-		}
-
-		records = append(records, record)
+		})
 	}
 
 	return records, nil

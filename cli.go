@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -9,14 +10,19 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/njason/shouldwater/shouldwater"
+	"github.com/njason/shouldwater/shouldwaterlib"
 )
 
 type Config struct {
-	TomorrowIoApiKey string `yaml:"tomorrowioApiKey"`
-	RecordsFile	string `yaml:"recordsFile"`
-	Lat string `yaml:"lat"`
-	Lng string `yaml:"lng"`
+	TomorrowioApiKey string `yaml:"tomorrowioApiKey"`
+	MailChimp        struct {
+		ApiKey     string `yaml:"apiKey"`
+		TemplateId uint   `yaml:"templateId"`
+		ListId     string `yaml:"listId"`
+	}
+	RecordsFile string `yaml:"recordsFile"`
+	Lat         string `yaml:"lat"`
+	Lng         string `yaml:"lng"`
 }
 
 func main() {
@@ -26,12 +32,36 @@ func main() {
 	}
 
 	if len(os.Args) < 2 {
-		records, err := loadFreeRecords(config.RecordsFile)
+		historicalRecords, err := loadFreeRecords(config.RecordsFile)
 		if err != nil {
 			log.Fatalln(err.Error())
 		}
 
-		shouldWater, err := shouldwater.ShouldWater(records)
+		if len(historicalRecords) < shouldwaterlib.HoursInWeek {
+			log.Fatalln(errors.New("need at least a week's worth of data to run"))
+		} else if len(historicalRecords) > shouldwaterlib.HoursInWeek {
+			// trim to the last week of data
+			historicalRecords = historicalRecords[len(historicalRecords)-shouldwaterlib.HoursInWeek:]
+		}
+
+		forecastRequest := NewTimelinesRequest(fmt.Sprintf("%s, %s", config.Lat, config.Lng), "metric", "1h", "nowPlus1h", "nowPlus5d")
+		forecastRecordsRaw, err := DoTimelinesRequest(config.TomorrowioApiKey, forecastRequest)
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
+
+		var forecastRecords []shouldwaterlib.Record
+		for _, record := range forecastRecordsRaw.Data.Timelines[0].Intervals {
+			forecastRecords = append(forecastRecords, shouldwaterlib.Record{
+				Timestamp: record.StartTime,
+				Temperature: record.Values.Temperature,
+				Humidity: record.Values.Humidity,
+				WindSpeed: record.Values.WindSpeed,
+				Precipitation: record.Values.PrecipitationIntensity,
+			})
+		}
+
+		shouldWater, err := shouldwaterlib.ShouldWater(historicalRecords, forecastRecords)
 		if err != nil {
 			log.Fatalln(err.Error())
 		}
@@ -42,12 +72,15 @@ func main() {
 		}
 
 		if shouldWater {
-			log.Println("Should water")
+			//err = createAndSendCampaign(config.MailChimp.ApiKey, config.MailChimp.TemplateId, config.MailChimp.ListId)
+			if err != nil {
+				log.Fatalln(err.Error())
+			}
 		}
 	} else {
 		switch os.Args[1] {
 		case "record":
-			err = RecordFreeTimelines(config.RecordsFile, config.Lat, config.Lng, config.TomorrowIoApiKey)
+			err = RecordFreeTimelines(config.RecordsFile, config.Lat, config.Lng, config.TomorrowioApiKey)
 			if err != nil {
 				log.Fatalln(err.Error())
 			}

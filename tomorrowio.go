@@ -60,7 +60,7 @@ func NewTimelinesRequest(location string, units string, timesteps string,
 		}
 }
 
-func DoTimelinesRequest(request timelinesRequest, apiKey string) (timelinesResponse, error) {
+func DoTimelinesRequest(apiKey string, request timelinesRequest) (timelinesResponse, error) {
 	req, err := http.NewRequest("GET", "https://api.tomorrow.io/v4/timelines", nil)
 	if err != nil {
 		return timelinesResponse{}, err

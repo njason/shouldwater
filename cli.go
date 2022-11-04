@@ -72,7 +72,7 @@ func main() {
 		}
 
 		if shouldWater {
-			//err = createAndSendCampaign(config.MailChimp.ApiKey, config.MailChimp.TemplateId, config.MailChimp.ListId)
+			err = createAndSendCampaign(config.MailChimp.ApiKey, config.MailChimp.TemplateId, config.MailChimp.ListId)
 			if err != nil {
 				log.Fatalln(err.Error())
 			}

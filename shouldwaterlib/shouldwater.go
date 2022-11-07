@@ -25,24 +25,58 @@ func ShouldWater(historicalRecords []Record, forecastRecords []Record) (bool, er
 		return false, errors.New("need exactly five days worth of forecast data to run")
 	}
 
-	totalHistoricalPrecipitation := totalPrecipitation(historicalRecords)
+	totalHistoricalPrecipitation := totalNonFastFallPrecipitation(historicalRecords)
+	averageHistoricalHighTemperature := averageDayHighTemperature(historicalRecords)
+	totalForecastPrecipitation := totalNonFastFallPrecipitation(forecastRecords)
 
-	if totalHistoricalPrecipitation < 25.4 {  // 1 inch in mm
-		
-		totalForecastPrecipitation := totalPrecipitation(forecastRecords)
-		if totalForecastPrecipitation < 50.8 {  // 2 inches in mm
-			return true, nil
+	if averageHistoricalHighTemperature > 29.4 {  // 85 F in C
+		if totalHistoricalPrecipitation < 25.4 {  // 1 inch in mm
+			if totalForecastPrecipitation < 25.4 {  // 1 inches in mm
+				return true, nil
+			}
+		}
+	} else {
+		if totalHistoricalPrecipitation < 20.32 {  // .8 inches in mm
+			if totalForecastPrecipitation < 12.7 {  // .5 inches in mm
+				return true, nil
+			}
 		}
 	}
+
 
 	return false, nil
 }
 
-func totalPrecipitation(records []Record) float64 {
+func totalNonFastFallPrecipitation(records []Record) float64 {
 	var total float64 
 	for _, record := range records {
-		total += record.Precipitation
+		if record.Precipitation < 25.4 {  // 1 inches in mm
+			total += record.Precipitation
+		}
 	}
 
 	return total
+}
+
+func averageDayHighTemperature(records []Record) float64 {
+	dayHighs := make(map[string]float64)
+
+	for _, record := range records {
+		day := record.Timestamp.Format("YYYYMMDD")
+
+		if dayHigh, ok := dayHighs[day]; ok {
+			if dayHigh < record.Temperature {
+				dayHighs[day] = record.Temperature
+			}
+		} else {
+			dayHighs[day] = record.Temperature
+		}
+	}
+
+	var dayHighSum float64
+	for _, dayHigh := range dayHighs {
+        dayHighSum += dayHigh
+    }
+
+	return dayHighSum / float64(len(dayHighs))
 }

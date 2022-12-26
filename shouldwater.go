@@ -1,4 +1,4 @@
-package shouldwaterlib
+package shouldwater
 
 import (
 	"errors"

@@ -1,8 +1,0 @@
-tomorrowioApiKey: xxx
-mailchimp:
-  apiKey: xxx
-  templateId: 1
-  listId: xxx
-recordsFile: ./records.csv
-lat: 40.7831
-lng: -73.9713

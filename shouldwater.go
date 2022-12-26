@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Record struct {
+type WeatherRecord struct {
 	Timestamp     time.Time
 	Temperature   float64
 	Humidity      float64
@@ -16,7 +16,7 @@ type Record struct {
 const HoursInWeek = 7 * 24
 const HoursInFiveDays = 5 * 24
 
-func ShouldWater(historicalRecords []Record, forecastRecords []Record) (bool, error) {
+func ShouldWater(historicalRecords []WeatherRecord, forecastRecords []WeatherRecord) (bool, error) {
 	if len(historicalRecords) != HoursInWeek {
 		return false, errors.New("need exactly a week's worth of historical data to run")
 	}
@@ -47,7 +47,7 @@ func ShouldWater(historicalRecords []Record, forecastRecords []Record) (bool, er
 	return false, nil
 }
 
-func totalNonFastFallPrecipitation(records []Record) float64 {
+func totalNonFastFallPrecipitation(records []WeatherRecord) float64 {
 	var total float64 
 	for _, record := range records {
 		if record.Precipitation < 25.4 {  // 1 inches in mm
@@ -58,7 +58,7 @@ func totalNonFastFallPrecipitation(records []Record) float64 {
 	return total
 }
 
-func averageDayHighTemperature(records []Record) float64 {
+func averageDayHighTemperature(records []WeatherRecord) float64 {
 	dayHighs := make(map[string]float64)
 
 	for _, record := range records {

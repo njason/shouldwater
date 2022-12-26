@@ -17,11 +17,3 @@
 # VS Code
 *.code-workspace
 .vscode/*
-
-# App
-
-shouldwater
-shouldwater.exe
-config.yaml
-records.csv
-records_archive.csv

@@ -3,8 +3,6 @@ package shouldwater
 import (
 	"errors"
 	"time"
-
-	"golang.org/x/tools/go/analysis/passes/nilness"
 )
 
 type WeatherRecord struct {
@@ -12,35 +10,37 @@ type WeatherRecord struct {
 	Temperature   float64
 	Humidity      float64
 	WindSpeed     float64
-	Precipitation	float64
+	Precipitation float64
 }
 
 const HoursInWeek = 7 * 24
 const HoursInFiveDays = 5 * 24
 
-const HighTempHistoricalPrecipitationMax = 25.4  // 1 inch in mm
-const HighTempForecastPrecipitationMax = 25.4  // 1 inch in mm
-const HistoricalPrecipitationMax = 20.32  // .8 inches in mm
-const ForecastPrecipitationMax = 12.7  // .5 inches in mm
-const WateringMax = 75.71  // liters
+const HighTempHistoricalPrecipitationMax = 25.4 // 1 inch in mm
+const HighTempForecastPrecipitationMax = 25.4   // 1 inch in mm
+const HistoricalPrecipitationMax = 20.32        // .8 inches in mm
+const ForecastPrecipitationMax = 12.7           // .5 inches in mm
+const WateringMax = 75.71                       // liters
 
-func ShouldWater(historicalRecords []WeatherRecord, forecastRecords []WeatherRecord) (float64, error) {
-	if len(historicalRecords) != HoursInWeek {
-		return 0.0, errors.New("need exactly a week's worth of historical data to run")
-	}
+// ShouldWater returns the amount of liters required for watering an unestablished street tree
+// given a weeks worth of historical and five days worth of weather data, in hourly granularity
+func ShouldWater(
+	historicalRecords []WeatherRecord,
+	forecastRecords []WeatherRecord,
+) (float64, error) {
 
-	if len(forecastRecords) != HoursInFiveDays {
-		return 0.0, errors.New("need exactly five days worth of forecast data to run")
+	err := validateInputData(historicalRecords, forecastRecords)
+	if err != nil {
+		return 0.0, err
 	}
 
 	totalHistoricalPrecipitation := totalNonFastFallPrecipitation(historicalRecords)
-	averageHistoricalHighTemperature := averageDayHighTemperature(historicalRecords)
 	totalForecastPrecipitation := totalNonFastFallPrecipitation(forecastRecords)
-
 	totalPrecipitation := totalHistoricalPrecipitation + totalForecastPrecipitation
+	averageHistoricalHighTemperature := averageDayHighTemperature(historicalRecords)
 
 	var totalPrecipitationMax float64
-	if averageHistoricalHighTemperature > 29.4 {  // 85 F in C
+	if averageHistoricalHighTemperature > 29.4 { // 85 F in C
 		totalPrecipitationMax = HighTempHistoricalPrecipitationMax + HighTempForecastPrecipitationMax
 	} else {
 		totalPrecipitationMax = HistoricalPrecipitationMax + ForecastPrecipitationMax
@@ -54,10 +54,22 @@ func ShouldWater(historicalRecords []WeatherRecord, forecastRecords []WeatherRec
 	return 0.0, nil
 }
 
+func validateInputData(historicalRecords []WeatherRecord, forecastRecords []WeatherRecord) error {
+	if len(historicalRecords) != HoursInWeek {
+		return errors.New("need exactly a week's worth of historical data to run")
+	}
+
+	if len(forecastRecords) != HoursInFiveDays {
+		return errors.New("need exactly five days worth of forecast data to run")
+	}
+
+	return nil
+}
+
 func totalNonFastFallPrecipitation(records []WeatherRecord) float64 {
-	var total float64 
+	var total float64
 	for _, record := range records {
-		if record.Precipitation < 25.4 {  // 1 inches in mm
+		if record.Precipitation < 25.4 { // 1 inches in mm
 			total += record.Precipitation
 		}
 	}
@@ -82,8 +94,8 @@ func averageDayHighTemperature(records []WeatherRecord) float64 {
 
 	var dayHighSum float64
 	for _, dayHigh := range dayHighs {
-        dayHighSum += dayHigh
-    }
+		dayHighSum += dayHigh
+	}
 
 	return dayHighSum / float64(len(dayHighs))
 }

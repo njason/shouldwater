@@ -1,7 +1,7 @@
 package shouldwater
 
 import (
-	"errors"
+	"fmt"
 	"time"
 )
 
@@ -29,7 +29,7 @@ func ShouldWater(
 	forecastRecords []WeatherRecord,
 ) (float64, error) {
 
-	err := validateInputData(historicalRecords, forecastRecords)
+	err := validateShouldWaterInputData(historicalRecords, forecastRecords)
 	if err != nil {
 		return 0.0, err
 	}
@@ -54,13 +54,49 @@ func ShouldWater(
 	return 0.0, nil
 }
 
-func validateInputData(historicalRecords []WeatherRecord, forecastRecords []WeatherRecord) error {
+func ShouldHaveWatered(weatherRecords []WeatherRecord) (float64, error) {
+
+	err := validateShouldHaveWateredInputData(weatherRecords)
+	if err != nil {
+		return 0.0, err
+	}
+
+	totalPrecipitation := totalNonFastFallPrecipitation(weatherRecords)
+	averageHistoricalHighTemperature := averageDayHighTemperature(weatherRecords)
+
+	var totalPrecipitationMax float64
+	if averageHistoricalHighTemperature > 29.4 { // 85 F in C
+		totalPrecipitationMax = HighTempHistoricalPrecipitationMax * 2
+	} else {
+		totalPrecipitationMax = HistoricalPrecipitationMax * 2
+	}
+
+	if totalPrecipitation < totalPrecipitationMax {
+		percentPrecipitation := totalPrecipitation / totalPrecipitationMax
+		return WateringMax * percentPrecipitation, nil
+	}
+
+	return 0.0, nil
+}
+
+func validateShouldWaterInputData(
+	historicalRecords []WeatherRecord,
+	forecastRecords []WeatherRecord,
+) error {
 	if len(historicalRecords) != HoursInWeek {
-		return errors.New("need exactly a week's worth of historical data to run")
+		return fmt.Errorf("need exactly a week's worth of historical data to run (%d records)", HoursInWeek)
 	}
 
 	if len(forecastRecords) != HoursInFiveDays {
-		return errors.New("need exactly five days worth of forecast data to run")
+		return fmt.Errorf("need exactly five days worth of forecast data to run (%d records)", HoursInFiveDays)
+	}
+
+	return nil
+}
+
+func validateShouldHaveWateredInputData(weatherRecords []WeatherRecord) error {
+	if len(weatherRecords) != HoursInWeek * 2 {
+		return fmt.Errorf("need exactly two week's worth of hourly records (%d records)", HoursInWeek * 2)
 	}
 
 	return nil
@@ -69,7 +105,7 @@ func validateInputData(historicalRecords []WeatherRecord, forecastRecords []Weat
 func totalNonFastFallPrecipitation(records []WeatherRecord) float64 {
 	var total float64
 	for _, record := range records {
-		if record.Precipitation < 25.4 { // 1 inches in mm
+		if record.Precipitation < 25.4 {  // 1 inches in mm
 			total += record.Precipitation
 		}
 	}

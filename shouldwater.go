@@ -23,7 +23,7 @@ const ForecastPrecipitationMax = 12.7           // .5 inches in mm
 const WateringMax = 75.71                       // liters
 
 // ShouldWater returns the amount of liters required for watering an unestablished street tree
-// given a weeks worth of historical and five days worth of weather data, in hourly granularity
+// given a weeks worth of historical and five days worth of forecasted weather data, in hourly granularity
 func ShouldWater(
 	historicalRecords []WeatherRecord,
 	forecastRecords []WeatherRecord,

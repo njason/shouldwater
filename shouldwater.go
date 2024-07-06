@@ -13,14 +13,14 @@ type WeatherRecord struct {
 	Precipitation float64
 }
 
-const HoursInWeek = 7 * 24
-const HoursInFiveDays = 5 * 24
+const HoursInWeek = 7 * 24  // 168
+const HoursInFiveDays = 5 * 24  // 120
 
 const HighTempHistoricalPrecipitationMax = 25.4 // 1 inch in mm
 const HighTempForecastPrecipitationMax = 25.4   // 1 inch in mm
 const HistoricalPrecipitationMax = 20.32        // .8 inches in mm
 const ForecastPrecipitationMax = 12.7           // .5 inches in mm
-const WateringMax = 75.71                       // liters
+const WateringMax = 75.71                       // 20 gallons in liters
 
 // ShouldWater returns the amount of liters required for watering an unestablished street tree
 // given a weeks worth of historical and five days worth of forecasted weather data, in hourly granularity
@@ -48,7 +48,7 @@ func ShouldWater(
 
 	if totalPrecipitation < totalPrecipitationMax {
 		percentPrecipitation := totalPrecipitation / totalPrecipitationMax
-		return WateringMax * percentPrecipitation, nil
+		return WateringMax - (WateringMax * percentPrecipitation), nil
 	}
 
 	return 0.0, nil

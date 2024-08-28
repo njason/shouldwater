@@ -13,8 +13,8 @@ type WeatherRecord struct {
 	Precipitation float64
 }
 
-const HoursInWeek = 7 * 24  // 168
-const HoursInFiveDays = 5 * 24  // 120
+const HoursInWeek = 7 * 24     // 168
+const HoursInFiveDays = 5 * 24 // 120
 
 const HighTempHistoricalPrecipitationMax = 25.4 // 1 inch in mm
 const HighTempForecastPrecipitationMax = 25.4   // 1 inch in mm
@@ -95,8 +95,8 @@ func validateShouldWaterInputData(
 }
 
 func validateShouldHaveWateredInputData(weatherRecords []WeatherRecord) error {
-	if len(weatherRecords) != HoursInWeek * 2 {
-		return fmt.Errorf("need exactly two week's worth of hourly records (%d records)", HoursInWeek * 2)
+	if len(weatherRecords) != HoursInWeek*2 {
+		return fmt.Errorf("need exactly two week's worth of hourly records (%d records)", HoursInWeek*2)
 	}
 
 	return nil
@@ -105,7 +105,7 @@ func validateShouldHaveWateredInputData(weatherRecords []WeatherRecord) error {
 func totalNonFastFallPrecipitation(records []WeatherRecord) float64 {
 	var total float64
 	for _, record := range records {
-		if record.Precipitation < 25.4 {  // 1 inches in mm
+		if record.Precipitation < 25.4 { // 1 inches in mm
 			total += record.Precipitation
 		}
 	}

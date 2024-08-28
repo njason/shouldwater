@@ -12,14 +12,14 @@ import (
 // For now, all the timestamps are the same. This should change if hourly timestamp sequencess are validated
 func generateWeatherRecords(hourAmount int, temperature float64, precipitation float64) []WeatherRecord {
 	records := make([]WeatherRecord, 0, hourAmount)
-	start := time.Now()//.Add(backForward * time.Duration(hourAmount) * time.Hour)  // Go back 168 hours
+	start := time.Now() //.Add(backForward * time.Duration(hourAmount) * time.Hour)  // Go back 168 hours
 
 	for i := 0; i < hourAmount; i++ {
-		timestamp := start//start.Add(time.Duration(i) * time.Hour)
+		timestamp := start //start.Add(time.Duration(i) * time.Hour)
 
 		// Predefined weather conditions with zero precipitation
 		weatherRecord := WeatherRecord{
-			Timestamp: timestamp,
+			Timestamp:     timestamp,
 			Temperature:   temperature,
 			Humidity:      0.0,
 			WindSpeed:     0.0,
@@ -30,7 +30,6 @@ func generateWeatherRecords(hourAmount int, temperature float64, precipitation f
 
 	return records
 }
-
 
 func TestNotEnoughData(t *testing.T) {
 	_, err := ShouldWater([]WeatherRecord{}, []WeatherRecord{})
